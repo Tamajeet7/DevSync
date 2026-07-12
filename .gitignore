@@ -1,0 +1,33 @@
+# dependencies
+node_modules
+
+# production
+dist
+build
+
+# environment variables
+.env
+.env.*
+
+# logs
+logs
+*.log
+npm-debug.log*
+
+# editor
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+# Vite
+frontend/dist
+
+# TypeScript
+*.tsbuildinfo
