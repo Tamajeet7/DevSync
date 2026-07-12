@@ -59,6 +59,11 @@ DevSync is a full-stack collaboration platform that brings project management, t
 
 ---
 
+## Screenshots
+
+Coming Soon 🚀
+
 ## License
 
 MIT
+

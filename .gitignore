@@ -31,3 +31,5 @@ frontend/dist
 
 # TypeScript
 *.tsbuildinfo
+
+backend/dist
