@@ -1,16 +1,39 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import cookieParser from "cookie-parser";
+import router from "./routes";
+
+import { env } from "./config/env";
+import { errorHandler } from "./middleware/error.middleware";
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// Security
+app.use(helmet());
 
-app.get("/", (_, res) => {
-  res.json({
-    success: true,
-    message: "DevSync Backend Running 🚀",
-  });
-});
+// CORS
+app.use(
+  cors({
+    origin: env.CLIENT_URL,
+    credentials: true,
+  })
+);
+
+// Logger
+app.use(morgan("dev"));
+
+// Body Parsers
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Cookies
+app.use(cookieParser());
+
+app.use("/api/v1", router);
+
+// Error Handler (Always Last)
+app.use(errorHandler);
 
 export default app;
