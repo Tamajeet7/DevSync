@@ -4,6 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import router from "./routes";
+import authRoutes from "./modules/auth/auth.routes";
 
 import { env } from "./config/env";
 import { errorHandler } from "./middleware/error.middleware";
@@ -32,6 +33,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api/v1", router);
+
+app.use("/api/v1/auth", authRoutes);
 
 // Error Handler (Always Last)
 app.use(errorHandler);

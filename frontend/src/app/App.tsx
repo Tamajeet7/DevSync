@@ -1,15 +1,12 @@
-function App() {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-5xl font-bold">DevSync</h1>
+import { RouterProvider } from "react-router-dom";
 
-        <p className="mt-4 text-lg text-gray-500">
-          AI-Powered Developer Collaboration Platform
-        </p>
-      </div>
-    </div>
+import Providers from "./providers";
+import { router } from "./routes";
+
+export default function App() {
+  return (
+    <Providers>
+      <RouterProvider router={router} />
+    </Providers>
   );
 }
-
-export default App;
