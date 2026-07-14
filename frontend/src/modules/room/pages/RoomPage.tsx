@@ -1,10 +1,25 @@
+import EditorHeader from "../../editor/components/EditorHeader";
+import CodeEditor from "../../editor/components/CodeEditor";
+import EditorSidebar from "../../editor/components/EditorSidebar";
+import EditorConsole from "../../editor/components/EditorConsole";
+
 export default function RoomPage() {
   return (
-    <div className="h-screen bg-[#0d1117] text-white flex items-center justify-center">
+    <div className="flex h-screen flex-col bg-[#050505] text-white">
 
-      <h1 className="text-5xl font-bold">
-        Monaco Editor Coming...
-      </h1>
+      <EditorHeader />
+
+      <div className="flex flex-1 overflow-hidden">
+
+        <div className="flex-1">
+          <CodeEditor />
+        </div>
+
+        <EditorSidebar />
+
+      </div>
+
+      <EditorConsole />
 
     </div>
   );

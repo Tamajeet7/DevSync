@@ -1,4 +1,4 @@
-import axios from "../../../lib/axios";
+import {api} from "../../../lib/axios";
 
 export interface CreateRoomDto {
   name: string;
@@ -16,17 +16,17 @@ export interface Room {
 
 class RoomService {
   async create(data: CreateRoomDto) {
-    const res = await axios.post("/rooms", data);
+    const res = await api.post("/rooms", data);
     return res.data as Room;
   }
 
   async getAll() {
-    const res = await axios.get("/rooms");
+    const res = await api.get("/rooms");
     return res.data as Room[];
   }
 
   async getById(id: string) {
-    const res = await axios.get(`/rooms/${id}`);
+    const res = await api.get(`/rooms/${id}`);
     return res.data as Room;
   }
 }
