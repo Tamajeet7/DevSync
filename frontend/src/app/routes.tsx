@@ -1,17 +1,23 @@
-import { createBrowserRouter } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
-import MainLayout from "../shared/layouts/MainLayout";
-import LandingPage from "../features/landing/pages/LandingPage";
+import LandingPage from "../modules/landing/pages/LandingPage";
+import DashboardPage from "../modules/dashboard/pages/DashboardPage";
+import RoomPage from "../modules/room/pages/RoomPage";
 
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    children: [
-      {
-        index: true,
-        element: <LandingPage />,
-      },
-    ],
-  },
-]);
+export default function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+
+      <Route
+        path="/dashboard"
+        element={<DashboardPage />}
+      />
+
+      <Route
+        path="/room/:roomId"
+        element={<RoomPage />}
+      />
+    </Routes>
+  );
+}

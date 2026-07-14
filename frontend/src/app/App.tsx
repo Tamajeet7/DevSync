@@ -1,12 +1,18 @@
-import { RouterProvider } from "react-router-dom";
+import { useEffect } from "react";
 
-import Providers from "./providers";
-import { router } from "./routes";
+import { socket } from "../services/socket";
+import AppRoutes from "./routes";
 
 export default function App() {
-  return (
-    <Providers>
-      <RouterProvider router={router} />
-    </Providers>
-  );
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("✅ Socket Connected:", socket.id);
+    });
+
+    return () => {
+      socket.off("connect");
+    };
+  }, []);
+
+  return <AppRoutes />;
 }

@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import router from "./routes";
 import authRoutes from "./modules/auth/auth.routes";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes";
+import roomRoutes from "./modules/room/room.routes";
 
 import { env } from "./config/env";
 import { errorHandler } from "./middleware/error.middleware";
@@ -36,6 +37,8 @@ app.use(cookieParser());
 app.use("/api/v1", router);
 
 app.use("/api/v1/dashboard", dashboardRoutes);
+
+app.use("/api/v1/rooms", roomRoutes);
 
 app.use("/api/v1/auth", authRoutes);
 
