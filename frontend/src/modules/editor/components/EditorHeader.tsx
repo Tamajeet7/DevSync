@@ -10,15 +10,19 @@ export default function EditorHeader() {
 
       <div className="flex items-center gap-4">
 
-        <select className="rounded-lg border border-zinc-700 bg-black px-4 py-2">
+        <select
+            className="rounded-lg border border-zinc-700 bg-black px-4 py-2"
+        >
 
-          <option>typescript</option>
+            <option value="typescript">TypeScript</option>
 
-          <option>javascript</option>
+            <option value="javascript">JavaScript</option>
 
-          <option>cpp</option>
+            <option value="cpp">C++</option>
 
-          <option>python</option>
+            <option value="python">Python</option>
+
+            <option value="java">Java</option>
 
         </select>
 

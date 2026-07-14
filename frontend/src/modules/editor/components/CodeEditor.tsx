@@ -1,10 +1,32 @@
-export default function CodeEditor() {
-  return (
-    <div className="flex h-full items-center justify-center bg-[#111827]">
+import Editor from "@monaco-editor/react";
+import { useState } from "react";
 
-      <h2 className="text-3xl text-zinc-500">
-        Monaco Editor
-      </h2>
+export default function CodeEditor() {
+  const [code, setCode] = useState(`function hello() {
+  console.log("Hello DevSync");
+}`);
+
+  return (
+    <div className="h-full">
+
+      <Editor
+        height="100%"
+        defaultLanguage="typescript"
+        theme="vs-dark"
+        value={code}
+        onChange={(value) => setCode(value ?? "")}
+        options={{
+          fontSize: 15,
+          minimap: {
+            enabled: false,
+          },
+          automaticLayout: true,
+          scrollBeyondLastLine: false,
+          padding: {
+            top: 20,
+          },
+        }}
+      />
 
     </div>
   );
