@@ -6,7 +6,7 @@ const router = Router();
 
 router.post(
   "/run",
-  ExecutionController.execute
+  ExecutionController.run
 );
 
 export default router;

@@ -24,3 +24,9 @@ router.get(
 );
 
 export default router;
+
+router.delete(
+  "/:id",
+  authenticate,
+  RoomController.deleteRoom
+);

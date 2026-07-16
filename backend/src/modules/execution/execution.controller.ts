@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { ExecutionService } from "./execution.service";
 
 export class ExecutionController {
-  static async execute(
+  static async run(
     req: Request,
     res: Response
   ) {
@@ -16,7 +16,7 @@ export class ExecutionController {
       return res.status(500).json({
         success: false,
         message:
-          error?.response?.data ??
+          error.response?.data ||
           error.message,
       });
     }

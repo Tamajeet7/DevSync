@@ -52,4 +52,25 @@ export class RoomController {
 
     return res.json(room);
   }
+
+  static async deleteRoom(
+    req: AuthRequest,
+    res: Response
+  ) {
+    try {
+      await RoomService.deleteRoom(
+        String(req.params.id)
+      );
+
+      return res.json({
+        success: true,
+        message: "Room deleted",
+      });
+    } catch {
+      return res.status(404).json({
+        success: false,
+        message: "Room not found",
+      });
+    }
+  }
 }

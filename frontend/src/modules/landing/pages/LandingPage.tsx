@@ -1,13 +1,21 @@
-import Navbar from "../../../shared/components/Navbar";
-import Hero from "../../../shared/components/Hero";
-import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Hero from "../components/Hero";
+import Features from "../components/Features";
+import TechSection from "../components/TechSection";
+import PreviewSection from "../components/PreviewSection";
+import CTASection from "../components/CTASection";
+import Footer from "../components/Footer";
 
 export default function LandingPage() {
-  const navigate = useNavigate();
   return (
-    <>
+    <main className="bg-[#090E17]">
       <Navbar />
       <Hero />
-    </>
+      <Features />
+      <TechSection />
+      <PreviewSection />
+      <CTASection />
+      <Footer />
+    </main>
   );
 }
