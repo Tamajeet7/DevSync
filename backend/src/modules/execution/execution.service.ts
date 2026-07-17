@@ -128,7 +128,15 @@ export class ExecutionService {
     fs.writeFileSync(stdinPath, data.stdin || "", "utf8");
 
     try {
-      const compileResult = await this.compileIfNecessary(tempDir, config);
+      const dockerAvailable = await this.isDockerAvailable();
+      
+      let compileResult: string | null = null;
+      if (dockerAvailable) {
+        compileResult = await this.compileIfNecessary(tempDir, config);
+      } else {
+        compileResult = await this.compileLocally(tempDir, config);
+      }
+
       if (compileResult) {
         // Compilation failed!
         this.cleanupDir(tempDir);
@@ -141,8 +149,13 @@ export class ExecutionService {
         };
       }
 
-      // Run code in Docker container
-      const runResult = await this.runInDocker(tempDir, config);
+      // Run code
+      let runResult;
+      if (dockerAvailable) {
+        runResult = await this.runInDocker(tempDir, config);
+      } else {
+        runResult = await this.runLocally(tempDir, config);
+      }
       this.cleanupDir(tempDir);
 
       return {
@@ -164,6 +177,14 @@ export class ExecutionService {
     }
   }
 
+  private static isDockerAvailable(): Promise<boolean> {
+    return new Promise((resolve) => {
+      exec("docker --version", (error) => {
+        resolve(!error);
+      });
+    });
+  }
+
   private static compileIfNecessary(tempDir: string, config: LanguageConfig): Promise<string | null> {
     if (!config.compileCmd) return Promise.resolve(null);
 
@@ -182,12 +203,63 @@ export class ExecutionService {
     });
   }
 
+  private static compileLocally(tempDir: string, config: LanguageConfig): Promise<string | null> {
+    if (!config.compileCmd) return Promise.resolve(null);
+
+    return new Promise((resolve) => {
+      exec(config.compileCmd!, { cwd: tempDir, timeout: 15000 }, (error, stdout, stderr) => {
+        if (error) {
+          resolve(stderr || stdout || error.message);
+        } else {
+          resolve(null);
+        }
+      });
+    });
+  }
+
   private static runInDocker(tempDir: string, config: LanguageConfig): Promise<{ stdout: string; stderr: string; status: string }> {
     // Docker command to run. Read stdin from stdin.txt if present
     const dockerCmd = `docker run --rm -v "${tempDir}:/app" -w /app ${config.image} sh -c "${config.runCmd} < stdin.txt"`;
 
     return new Promise((resolve) => {
       exec(dockerCmd, { timeout: 15000 }, (error, stdout, stderr) => {
+        if (error) {
+          if (error.killed) {
+            resolve({
+              stdout,
+              stderr: stderr ? `${stderr}\nTime Limit Exceeded (15s)` : "Time Limit Exceeded (15s)",
+              status: "Time Limit Exceeded",
+            });
+          } else {
+            resolve({
+              stdout,
+              stderr: stderr || error.message,
+              status: "Runtime Error",
+            });
+          }
+        } else {
+          resolve({
+            stdout,
+            stderr,
+            status: "Accepted",
+          });
+        }
+      });
+    });
+  }
+
+  private static runLocally(tempDir: string, config: LanguageConfig): Promise<{ stdout: string; stderr: string; status: string }> {
+    let runCmd = config.runCmd;
+    
+    // Replace 'python ' with 'python3 ' for alpine compatibility
+    if (runCmd.startsWith("python ")) {
+      runCmd = runCmd.replace("python ", "python3 ");
+    }
+
+    const fullCmd = `${runCmd} < stdin.txt`;
+
+    return new Promise((resolve) => {
+      exec(fullCmd, { cwd: tempDir, timeout: 15000 }, (error, stdout, stderr) => {
         if (error) {
           if (error.killed) {
             resolve({
