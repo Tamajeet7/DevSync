@@ -36,6 +36,17 @@ export class RoomService {
     });
   }
 
+  static async updateRoomCode(roomId: string, code: string) {
+    return prisma.room.update({
+      where: {
+        id: roomId,
+      },
+      data: {
+        code,
+      },
+    });
+  }
+
   static async deleteRoom(roomId: string) {
     return prisma.room.delete({
       where: {

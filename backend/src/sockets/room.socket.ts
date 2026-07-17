@@ -1,4 +1,5 @@
 import { Socket, Server } from "socket.io";
+import { RoomService } from "../modules/room/room.service";
 
 interface ChatMessage {
   id: string;
@@ -10,6 +11,12 @@ interface ChatMessage {
 
 // In-memory room participants tracker: roomId -> Map<socketId, { id, name }>
 const roomParticipants = new Map<string, Map<string, { id: string; name: string }>>();
+
+// In-memory code cache: roomId -> code
+const roomCodeCache = new Map<string, string>();
+
+// In-memory debounced save timers: roomId -> NodeJS.Timeout
+const saveTimers = new Map<string, NodeJS.Timeout>();
 
 export function registerRoomEvents(socket: Socket, io: Server) {
   socket.on("room:join", ({ roomId, userId, userName }: { roomId: string; userId: string; userName: string }) => {
@@ -37,6 +44,28 @@ export function registerRoomEvents(socket: Socket, io: Server) {
   socket.on("code-change", ({ roomId, code }: { roomId: string; code: string }) => {
     // Broadcast new code to everyone else in room
     socket.to(roomId).emit("code-change", code);
+
+    // Cache the latest code
+    roomCodeCache.set(roomId, code);
+
+    // Debounce database write (1.5 seconds)
+    if (saveTimers.has(roomId)) {
+      clearTimeout(saveTimers.get(roomId)!);
+    }
+
+    const timer = setTimeout(async () => {
+      saveTimers.delete(roomId);
+      try {
+        const latestCode = roomCodeCache.get(roomId);
+        if (latestCode !== undefined) {
+          await RoomService.updateRoomCode(roomId, latestCode);
+        }
+      } catch (err) {
+        console.error(`Failed to save room ${roomId} code:`, err);
+      }
+    }, 1500);
+
+    saveTimers.set(roomId, timer);
   });
 
   socket.on("chat-message", ({ roomId, message }: { roomId: string; message: ChatMessage }) => {
@@ -56,6 +85,20 @@ export function registerRoomEvents(socket: Socket, io: Server) {
       // Clean up room if empty
       if (roomParticipants.get(roomId)!.size === 0) {
         roomParticipants.delete(roomId);
+
+        // Immediately save final cached code to DB and clear timers
+        if (saveTimers.has(roomId)) {
+          clearTimeout(saveTimers.get(roomId)!);
+          saveTimers.delete(roomId);
+        }
+
+        const finalCode = roomCodeCache.get(roomId);
+        if (finalCode !== undefined) {
+          roomCodeCache.delete(roomId);
+          RoomService.updateRoomCode(roomId, finalCode).catch((err) => {
+            console.error("Failed to save final room code:", err);
+          });
+        }
       } else {
         // Send the updated list to remaining users
         const users = Array.from(roomParticipants.get(roomId)!.values());
