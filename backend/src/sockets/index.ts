@@ -16,10 +16,10 @@ export function initializeSocket(server: http.Server) {
   io.on("connection", (socket) => {
     console.log("⚡", socket.id, "connected");
 
-    registerRoomEvents(socket);
+    registerRoomEvents(socket, io);
 
     socket.on("disconnect", () => {
       console.log("❌", socket.id, "disconnected");
     });
   });
-}
+}

@@ -20,8 +20,11 @@ export default function RoomPage() {
     output,
     error,
     isExecuting,
+    messages,
     handleCodeChange,
     runCode,
+    sendMessage,
+    currentUser,
   } = useWorkspace(roomId);
 
   if (!user) {
@@ -49,7 +52,6 @@ export default function RoomPage() {
         />
 
         <div className="flex flex-1 overflow-hidden">
-          {/* Main IDE area using react-resizable-panels for flexible layout */}
           <PanelGroup direction="horizontal">
             {/* Editor & Terminal Column */}
             <Panel defaultSize={80} minSize={30} className="flex flex-col">
@@ -88,7 +90,12 @@ export default function RoomPage() {
 
             {/* Sidebar Panel */}
             <Panel defaultSize={20} minSize={15} maxSize={30}>
-              <WorkspaceSidebar participants={participants} />
+              <WorkspaceSidebar
+                participants={participants}
+                messages={messages}
+                sendMessage={sendMessage}
+                currentUser={currentUser}
+              />
             </Panel>
           </PanelGroup>
         </div>

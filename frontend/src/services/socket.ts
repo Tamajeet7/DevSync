@@ -1,21 +1,25 @@
 import { io, Socket } from "socket.io-client";
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const SOCKET_URL = "http://localhost:5000";
 
 let socket: Socket | null = null;
 
 export const initSocket = (roomId: string, userId: string, userName: string) => {
-  if (!socket) {
-    socket = io(SOCKET_URL, {
-      query: {
-        roomId,
-        userId,
-        userName,
-      },
-      transports: ["websocket"],
-      reconnectionAttempts: 5,
-    });
+  if (socket) {
+    socket.disconnect();
+    socket = null;
   }
+
+  socket = io(SOCKET_URL, {
+    transports: ["websocket"],
+    reconnectionAttempts: 5,
+  });
+
+  socket.on("connect", () => {
+    // After connection, emit the join event with user info
+    socket?.emit("room:join", { roomId, userId, userName });
+  });
+
   return socket;
 };
 

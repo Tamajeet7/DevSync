@@ -7,6 +7,7 @@ import router from "./routes";
 import authRoutes from "./modules/auth/auth.routes";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes";
 import roomRoutes from "./modules/room/room.routes";
+import executionRoutes from "./modules/execution/execution.routes";
 
 import { env } from "./config/env";
 import { errorHandler } from "./middleware/error.middleware";
@@ -41,6 +42,8 @@ app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/rooms", roomRoutes);
 
 app.use("/api/v1/auth", authRoutes);
+
+app.use("/api/v1/execution", executionRoutes);
 
 // Error Handler (Always Last)
 app.use(errorHandler);
