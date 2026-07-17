@@ -23,3 +23,7 @@ export const loginSchema = z.object({
     .string()
     .min(6),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});

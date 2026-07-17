@@ -8,31 +8,24 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-
-  rooms     Room[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String    @id @default(cuid())
+  name                String
+  email               String    @unique
+  password            String
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  resetPasswordExpiry DateTime?
+  resetPasswordToken  String?
+  rooms               Room[]
 }
 
 model Room {
-  id         String   @id @default(cuid())
-
-  name       String
-
-  language   String   @default("typescript")
-
-  code       String   @default("")
-
-  ownerId    String
-
-  owner      User     @relation(fields: [ownerId], references: [id])
-
-  createdAt  DateTime @default(now())
-
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  language  String   @default("typescript")
+  ownerId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  code      String   @default("")
+  owner     User     @relation(fields: [ownerId], references: [id])
 }

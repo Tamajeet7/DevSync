@@ -14,4 +14,9 @@ router.post(
   AuthController.login
 );
 
+router.post(
+  "/forgot-password",
+  AuthController.forgotPassword
+);
+
 export default router;

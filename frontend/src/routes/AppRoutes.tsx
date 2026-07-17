@@ -1,15 +1,16 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from "react-router-dom";
 
-import LandingPage from '../modules/landing/pages/LandingPage';
-import LoginPage from '../modules/auth/pages/LoginPage';
-import RegisterPage from '../modules/auth/pages/RegisterPage';
-import DashboardPage from '../modules/dashboard/pages/DashboardPage';
-import RoomPage from '../modules/room/pages/RoomPage';
+import LandingPage from "../modules/landing/pages/LandingPage";
+import DashboardPage from "../modules/dashboard/pages/DashboardPage";
+import RoomPage from "../modules/room/pages/RoomPage";
+
+import Login from "../modules/auth/pages/Login";
+import Register from "../modules/auth/pages/Register";
+import ForgotPassword from "../modules/auth/pages/ForgotPassword";
 
 export default function AppRoutes() {
   return (
     <Routes>
-
       <Route
         path="/"
         element={<LandingPage />}
@@ -17,12 +18,17 @@ export default function AppRoutes() {
 
       <Route
         path="/login"
-        element={<LoginPage />}
+        element={<Login />}
       />
 
       <Route
         path="/register"
-        element={<RegisterPage />}
+        element={<Register />}
+      />
+
+      <Route
+        path="/forgot-password"
+        element={<ForgotPassword />}
       />
 
       <Route
@@ -39,7 +45,6 @@ export default function AppRoutes() {
         path="*"
         element={<Navigate to="/" replace />}
       />
-
     </Routes>
   );
 }
