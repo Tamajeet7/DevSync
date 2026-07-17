@@ -67,12 +67,12 @@ export function useWorkspace(roomId: string | undefined) {
       setCode(newCode);
     });
 
-    socket.on("user-joined", (newUser: any) => {
-      // Keep for local logs/effects if needed, but room:users handles the list state
+    socket.on("user-joined", () => {
+      // Keep listener for future notifications or local logs/effects
     });
 
-    socket.on("user-left", (userId: string) => {
-      // Keep for local logs/effects if needed, but room:users handles the list state
+    socket.on("user-left", () => {
+      // Keep listener for future notifications or local logs/effects
     });
 
     socket.on("room:users", (users: any[]) => {
