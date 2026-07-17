@@ -68,14 +68,19 @@ export function useWorkspace(roomId: string | undefined) {
     });
 
     socket.on("user-joined", (newUser: any) => {
-      setParticipants((prev) => {
-        if (prev.find((p) => p.id === newUser.id)) return prev;
-        return [...prev, newUser];
-      });
+      // Keep for local logs/effects if needed, but room:users handles the list state
     });
 
     socket.on("user-left", (userId: string) => {
-      setParticipants((prev) => prev.filter((p) => p.id !== userId));
+      // Keep for local logs/effects if needed, but room:users handles the list state
+    });
+
+    socket.on("room:users", (users: any[]) => {
+      // Deduplicate by ID just in case
+      const uniqueUsers = users.filter(
+        (u, index, self) => self.findIndex((o) => o.id === u.id) === index
+      );
+      setParticipants(uniqueUsers);
     });
 
     // Chat listener
