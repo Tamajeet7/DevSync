@@ -7,6 +7,7 @@ import { useAuthStore } from "../../../store/authStore";
 import { useRooms } from "../../room/hooks/useRooms";
 import RoomList from "../../room/components/RoomList";
 import CreateRoomModal from "../../room/components/CreateRoomModal";
+import JoinRoomModal from "../../room/components/JoinRoomModal";
 
 function FadeUp({ delay = 0, children, className }: { delay?: number; children: React.ReactNode; className?: string }) {
   return (
@@ -24,6 +25,7 @@ function FadeUp({ delay = 0, children, className }: { delay?: number; children: 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
   const [createOpen, setCreateOpen] = useState(false);
+  const [joinOpen, setJoinOpen] = useState(false);
   const { rooms, loading, deleteRoom } = useRooms();
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
@@ -55,7 +57,10 @@ export default function DashboardPage() {
               <Plus size={16} />
               New Room
             </button>
-            <button className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white active:scale-95">
+            <button
+              onClick={() => setJoinOpen(true)}
+              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-zinc-300 transition-all hover:bg-white/[0.08] hover:text-white active:scale-95"
+            >
               <Users size={16} />
               Join
             </button>
@@ -151,6 +156,7 @@ export default function DashboardPage() {
       </div>
 
       <CreateRoomModal open={createOpen} onClose={() => setCreateOpen(false)} />
+      <JoinRoomModal open={joinOpen} onClose={() => setJoinOpen(false)} />
     </DashboardLayout>
   );
 }

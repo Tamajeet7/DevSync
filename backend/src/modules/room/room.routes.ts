@@ -19,7 +19,6 @@ router.get(
 
 router.get(
   "/:id",
-  authenticate,
   RoomController.getRoom
 );
 

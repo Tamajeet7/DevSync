@@ -25,21 +25,37 @@ export function useWorkspace(roomId: string | undefined) {
   // Chat state
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  // Initialize Room & Socket
+  // Load room details via API
+  useEffect(() => {
+    if (!roomId) return;
+    api.get(`/rooms/${roomId}`)
+      .then((res) => {
+        setRoom(res.data);
+        if (res.data.code) {
+          setCode(res.data.code);
+        } else {
+          const templates: Record<string, string> = {
+            python: "# Write your Python code here\nprint('Hello, DevSync!')\n",
+            javascript: "// Write your JavaScript code here\nconsole.log('Hello, DevSync!');\n",
+            typescript: "// Write your TypeScript code here\nconst greeting: string = 'Hello, DevSync!';\nconsole.log(greeting);\n",
+            cpp: "#include <iostream>\n\nint main() {\n    std::cout << \"Hello, DevSync!\" << std::endl;\n    return 0;\n}\n",
+            c: "#include <stdio.h>\n\nint main() {\n    printf(\"Hello, DevSync!\\n\");\n    return 0;\n}\n",
+            java: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, DevSync!\");\n    }\n}\n",
+            go: "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello, DevSync!\")\n}\n",
+            rust: "fn main() {\n    println!(\"Hello, DevSync!\");\n}\n",
+          };
+          const lang = res.data.language.toLowerCase();
+          setCode(templates[lang] || "// Welcome to DevSync!\n");
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load room details:", err);
+      });
+  }, [roomId]);
+
+  // Initialize Socket and event handlers
   useEffect(() => {
     if (!roomId || !user) return;
-
-    // Mock a room based on ID until room API is wired up
-    setRoom({
-      id: roomId,
-      name: "Collaborative Session",
-      language: "javascript",
-      ownerId: user.id,
-      code: "// Welcome to DevSync!\n// Start coding and collaborate in real-time.\n",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-    setCode("// Welcome to DevSync!\n// Start coding and collaborate in real-time.\n");
 
     // Add self to participants
     setParticipants([{ id: user.id, name: user.name }]);

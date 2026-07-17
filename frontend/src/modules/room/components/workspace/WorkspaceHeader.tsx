@@ -1,6 +1,6 @@
 import { ArrowLeft, Play, Share2, Check, Copy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { Room } from "../../types";
 
 interface WorkspaceHeaderProps {
@@ -17,24 +17,55 @@ export default function WorkspaceHeader({
   participants,
 }: WorkspaceHeaderProps) {
   const navigate = useNavigate();
-  const [copied, setCopied] = useState(false);
+  const [showInviteDropdown, setShowInviteDropdown] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleShare = async () => {
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowInviteDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleCopyLink = async () => {
     const inviteUrl = window.location.href;
     try {
       await navigator.clipboard.writeText(inviteUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
     } catch {
-      // Fallback for browsers that block clipboard API
       const textArea = document.createElement("textarea");
       textArea.value = inviteUrl;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand("copy");
       document.body.removeChild(textArea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
+
+  const handleCopyCode = async () => {
+    if (!room) return;
+    try {
+      await navigator.clipboard.writeText(room.id);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = room.id;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
     }
   };
 
@@ -82,33 +113,55 @@ export default function WorkspaceHeader({
           )}
         </div>
 
-        {/* Share / Invite Button */}
-        <div className="relative">
+        {/* Share / Invite Dropdown */}
+        <div className="relative" ref={dropdownRef}>
           <button
-            onClick={handleShare}
+            onClick={() => setShowInviteDropdown(!showInviteDropdown)}
             className={`flex h-8 items-center gap-2 rounded-lg border px-3 text-xs font-medium transition-all duration-300 ${
-              copied
-                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+              showInviteDropdown
+                ? "border-purple-500 bg-purple-500/10 text-purple-300"
                 : "border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white"
             }`}
           >
-            {copied ? (
-              <>
-                <Check size={13} />
-                Link Copied!
-              </>
-            ) : (
-              <>
-                <Share2 size={13} />
-                Invite
-              </>
-            )}
+            <Share2 size={13} />
+            <span>Invite</span>
           </button>
 
-          {/* Tooltip shown briefly */}
-          {copied && (
-            <div className="absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-zinc-900 px-2.5 py-1.5 text-[10px] text-zinc-300 ring-1 ring-white/10 shadow-xl">
-              Share this URL with your team ✓
+          {showInviteDropdown && (
+            <div className="absolute right-0 top-10 z-50 w-72 rounded-2xl border border-white/[0.08] bg-[#0c0514] p-4 shadow-2xl backdrop-blur-xl">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Invite Collaborators</h3>
+              
+              <div className="mt-4 space-y-3">
+                {/* Room Code */}
+                <div className="space-y-1">
+                  <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest">Room Code</span>
+                  <div className="flex items-center justify-between rounded-lg bg-white/[0.04] p-2 border border-white/[0.06]">
+                    <span className="font-mono text-xs text-zinc-300 select-all truncate max-w-[180px]">{room?.id || "Loading..."}</span>
+                    <button
+                      onClick={handleCopyCode}
+                      className="p-1 rounded text-zinc-400 hover:bg-white/5 hover:text-white transition"
+                      title="Copy Code"
+                    >
+                      {copiedCode ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Invite Link */}
+                <div className="space-y-1">
+                  <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest">Invite Link</span>
+                  <div className="flex items-center justify-between rounded-lg bg-white/[0.04] p-2 border border-white/[0.06]">
+                    <span className="font-mono text-xs text-zinc-300 select-all truncate max-w-[180px]">{window.location.href}</span>
+                    <button
+                      onClick={handleCopyLink}
+                      className="p-1 rounded text-zinc-400 hover:bg-white/5 hover:text-white transition"
+                      title="Copy Link"
+                    >
+                      {copiedLink ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>

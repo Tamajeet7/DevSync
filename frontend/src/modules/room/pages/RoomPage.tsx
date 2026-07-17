@@ -27,12 +27,12 @@ export default function RoomPage() {
     currentUser,
   } = useWorkspace(roomId);
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
   if (!roomId) {
     return <Navigate to="/dashboard" replace />;
+  }
+
+  if (!user) {
+    return <Navigate to={`/room/${roomId}/join`} replace />;
   }
 
   return (
