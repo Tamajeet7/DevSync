@@ -1,10 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+import api from "../../../lib/axios";
 import { initSocket, disconnectSocket, getSocket } from "../../../services/socket";
 import { useAuthStore } from "../../../store/authStore";
 import type { Room } from "../../room/types";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export function useWorkspace(roomId: string | undefined) {
   const user = useAuthStore((state) => state.user);
@@ -77,7 +75,7 @@ export function useWorkspace(roomId: string | undefined) {
     setError("");
 
     try {
-      const response = await axios.post(`${API_URL}/execution/run`, {
+      const response = await api.post(`/execution/run`, {
         language: room.language.toLowerCase(),
         code,
       });
@@ -85,8 +83,11 @@ export function useWorkspace(roomId: string | undefined) {
       if (response.data.error) {
         setError(response.data.error);
       }
-      if (response.data.output) {
-        setOutput(response.data.output);
+      if (response.data.output || response.data.stdout) {
+        setOutput(response.data.output || response.data.stdout);
+      }
+      if (response.data.compile_output) {
+        setError(response.data.compile_output);
       }
     } catch (err: any) {
       setError(err.response?.data?.error || err.message || "Failed to execute code");
